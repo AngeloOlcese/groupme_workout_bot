@@ -107,7 +107,7 @@ func sendStats() {
 		scores = append(scores, vals)
 	}
 	slice.Sort(scores[:], func(i, j int) bool {
-	    return scores[i].lift < scores[j].lift
+	    return scores[i].lift > scores[j].lift
 	})
 	one := scores[0]
 	two:= scores[1]
@@ -115,7 +115,7 @@ func sendStats() {
 	sendBotMessage(botMessage{Bot_id: botID, Text: "Top 3 Lifters:\n"+"1."+one.name+" "+strconv.FormatInt(one.lift,10)+"\n2."+two.name+" "+strconv.FormatInt(two.lift,10)+"\n3."+three.name+" "+strconv.FormatInt(three.lift,10)})
 
 	slice.Sort(scores[:], func(i, j int) bool {
-	    return scores[i].throw < scores[j].throw
+	    return scores[i].throw > scores[j].throw
 	})
 	one = scores[0]
 	two = scores[1]
@@ -123,7 +123,7 @@ func sendStats() {
 	sendBotMessage(botMessage{Bot_id: botID, Text: "Top 3 Throwers:\n"+"1."+one.name+" "+strconv.FormatInt(one.throw,10)+"\n2."+two.name+" "+strconv.FormatInt(two.throw,10)+"\n3."+three.name+" "+strconv.FormatInt(three.throw,10)})
 
 	slice.Sort(scores[:], func(i, j int) bool {
-	    return scores[i].run < scores[j].run
+	    return scores[i].run > scores[j].run
 	})
 	one = scores[0]
 	two = scores[1]
