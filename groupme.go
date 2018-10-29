@@ -54,7 +54,7 @@ func writeLeaderboard() {
 	defer file.Close()
 
 	for key, val := range leaderboard {
-		fmt.Fprintf(file, key+" "+strconv.FormatInt(val.lift, 10)+" "+strconv.FormatInt(val.run, 10)+" "+strconv.FormatInt(val.throw, 10)+" "+val.name)
+		fmt.Fprintf(file, key+" "+strconv.FormatInt(val.lift, 10)+" "+strconv.FormatInt(val.run, 10)+" "+strconv.FormatInt(val.throw, 10)+" "+val.name+"\n")
 	}
 
 }
