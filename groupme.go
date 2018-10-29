@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"os"
+	"bufio"
 )
 
 const botID string = "44a74f5918bb19f58e4f148d5a"
@@ -27,7 +29,34 @@ type botMessage struct {
 }
 
 type lbentry struct {
-	lift, run, throw int
+	name string
+	lift, run, throw int64
+}
+
+func readLeaderboard() {
+	file, _ := os.Open("lb.txt")
+	scanner := bufio.NewScanner(file)
+  for scanner.Scan() {
+      line := strings.Split(scanner.Text(), " ")
+			lift, _ := strconv.ParseInt(line[1], 10, 64)
+			run, _ := strconv.ParseInt(line[2], 10, 64)
+			throw, _ := strconv.ParseInt(line[3], 10, 64)
+			leaderboard[line[0]] = &lbentry{lift: lift, run: run, throw: throw, name: line[4]}
+  }
+}
+
+func writeLeaderboard() {
+	os.Remove("lb.txt")
+	file, err := os.Create("lb.txt")
+	if err != nil {
+			log.Fatal("Cannot open file", err)
+	}
+	defer file.Close()
+
+	for key, val := range leaderboard {
+		fmt.Fprintf(file, key+" "+strconv.FormatInt(val.lift, 10)+" "+strconv.FormatInt(val.run, 10)+" "+strconv.FormatInt(val.throw, 10)+" "+val.name)
+	}
+
 }
 
 func parseRequest(rw http.ResponseWriter, req *http.Request) {
@@ -47,7 +76,7 @@ func parseCallback(message callback) {
 	responseText := ""
 	workout := false
 	if leaderboard[message.Sender_id] == nil {
-		entry := lbentry{}
+		entry := lbentry{name: message.Name}
 		leaderboard[message.Sender_id] = &entry
 	}
 	if strings.Contains(message.Text, "#lift") {
@@ -64,6 +93,7 @@ func parseCallback(message callback) {
 	}
 	if workout {
 		entry := leaderboard[message.Sender_id]
+		writeLeaderboard()
 
 		responseText += "Stats for " + message.Name + "-- |Lift: " + strconv.FormatInt(int64(entry.lift), 10) + "| Run: " + strconv.FormatInt(int64(entry.run), 10) + "| Throw: " + strconv.FormatInt(int64(entry.throw), 10) + "|"
 		sendBotMessage(botMessage{Bot_id: botID, Text: responseText})
@@ -89,6 +119,7 @@ func sendBotMessage(m botMessage) {
 }
 
 func main() {
+	readLeaderboard()
 	http.HandleFunc("/bot", parseRequest)
 	log.Fatal(http.ListenAndServe("localhost:8080", nil))
 }
